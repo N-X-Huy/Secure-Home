@@ -1,41 +1,98 @@
 # SECURE HOME
 
-## 1. Giới thiệu dự án
+Website thương mại điện tử chuyên kinh doanh thiết bị an ninh, kết hợp tư vấn giải pháp, khảo sát, lắp đặt và hỗ trợ sau bán hàng.
 
-SECURE HOME là website thương mại điện tử chuyên kinh doanh thiết bị an ninh, cung cấp các sản phẩm và dịch vụ hỗ trợ khách hàng lựa chọn giải pháp bảo vệ nhà ở, cửa hàng và văn phòng.
+## Công nghệ
 
-## 2. Mục tiêu
+- Front-end: React + Vite + React Router
+- Back-end: Node.js + Express
+- Database: MongoDB + Mongoose
+- Authentication: bcryptjs + JWT
+- Version control: Git + GitHub
 
-- Xây dựng website bán thiết bị an ninh trực tuyến.
-- Hỗ trợ tìm kiếm, lọc và so sánh sản phẩm.
-- Cung cấp chức năng giỏ hàng và đặt hàng.
-- Tư vấn bộ thiết bị theo nhu cầu và ngân sách.
-- Dự toán chi phí lắp đặt.
-- Hỗ trợ đặt lịch lắp đặt, bảo hành và bảo trì.
+## Cấu trúc
 
-## 3. Công nghệ dự kiến
+```text
+Secure-Home/
+├── client/
+├── server/
+└── docs/
+```
 
-- Frontend: React, HTML, CSS, JavaScript.
-- Backend: Node.js, Express.
-- Database: MongoDB.
-- Version Control: Git, GitHub.
+## Chạy dự án trên Windows
 
-## 4. Chức năng chính
+### 1. Chuẩn bị môi trường
 
-- Quản lý tài khoản và phân quyền.
-- Quản lý sản phẩm, danh mục và thương hiệu.
-- Giỏ hàng và quản lý đơn hàng.
-- Tư vấn giải pháp an ninh.
-- Dự toán chi phí lắp đặt.
-- Quản lý lịch hẹn và bảo hành.
-- Quản trị hệ thống và thống kê.
+Cài Node.js và MongoDB. Mở MongoDB service trước khi chạy Backend.
 
-## 5. Phương pháp phát triển
+### 2. Cấu hình Backend
 
-Dự án được phát triển theo Agile Scrum, chia thành các Sprint để triển khai, kiểm thử và cải thiện sản phẩm liên tục.
+Mở PowerShell:
 
-## 6. Thành viên
+```powershell
+cd D:\Secure-Home\server
+Copy-Item .env.example .env
+```
 
-- Thành viên 1:
-- Thành viên 2:
-- Thành viên 3:
+Mở `server/.env`, cấu hình `MONGODB_URI` và thay `JWT_SECRET` bằng chuỗi ngẫu nhiên dài, riêng tư (ít nhất 32 ký tự). Không commit file `.env` lên GitHub.
+
+Cài đặt và chạy:
+
+```powershell
+npm install
+npm run dev
+```
+
+Backend mặc định chạy tại `http://localhost:5000`.
+
+### 3. Chạy Frontend
+
+Mở cửa sổ PowerShell khác:
+
+```powershell
+cd D:\Secure-Home\client
+npm install
+npm run dev
+```
+
+Mở địa chỉ Vite hiển thị trên terminal, thường là `http://localhost:5173`.
+
+## API Sprint 1
+
+| Method | Endpoint                  | Quyền      |
+| ------ | ------------------------- | ---------- | --- | --- | --------------------------- | ---------- | --- | --- | ---------------------- | ----- |
+| POST   | `/api/auth/register`      | Công khai  |
+| POST   | `/api/auth/login`         | Công khai  |
+| POST   | `/api/auth/logout`        | JWT hợp lệ |
+| GET    | `/api/auth/me`            | JWT hợp lệ |
+| GET    | `/api/dashboard/customer` | customer   |
+| GET    | `/api/dashboard/employee` | employee   | \n  | GET | `/api/dashboard/technician` | technician | \n  | GET | `/api/dashboard/admin` | admin |
+| GET    | `/api/dashboard/admin`    | admin      |
+
+Các API được bảo vệ nhận Token qua HTTP Header:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+## Bốn vai trò
+
+- `customer`: khách hàng.
+- `employee`: nhân viên kinh doanh.
+- `technician`: kỹ thuật viên.
+- `admin`: quản trị viên.
+
+Đăng ký công khai luôn tạo vai trò `customer`. Không cho phép client tự gửi `role` để tự nâng quyền. Tài khoản nhân viên/kỹ thuật viên/admin cần được cấp vai trò bởi quy trình quản trị đáng tin cậy.
+
+## Tài liệu
+
+- `docs/project-overview.md`
+- `docs/functional-diagram.md`
+- `docs/sprint-plan.md`
+
+## Lưu ý bảo mật
+
+- Không chia sẻ hoặc commit `.env`.
+- Không đưa mật khẩu hoặc JWT secret vào mã nguồn.
+- JWT hiện có thời hạn 1 ngày; logout tăng `tokenVersion` trong tài khoản để vô hiệu hóa các token cũ.
+- localStorage tiện cho bản học tập/demo nhưng có rủi ro khi trang bị XSS. Khi triển khai thực tế nên đánh giá chuyển sang cookie `HttpOnly`, `Secure`, `SameSite`, bật HTTPS, rate limiting, logging và các biện pháp bảo mật bổ sung.
